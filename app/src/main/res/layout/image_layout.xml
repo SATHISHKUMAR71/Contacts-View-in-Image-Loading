@@ -17,8 +17,8 @@
 
                 <TextView
                     android:id="@+id/textName"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
                     android:layout_margin="7dp"
                     android:background="@drawable/circle_shape"
                     android:backgroundTint="?attr/colorPrimary"
@@ -26,7 +26,7 @@
                     android:padding="10dp"
                     android:text="C"
                     android:textColor="@color/white"
-                    android:textSize="20sp"
+                    android:textSize="28sp"
                     android:visibility="visible"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -34,8 +34,8 @@
 
                 <ImageView
                     android:id="@+id/contactImage"
-                    android:layout_width="45dp"
-                    android:layout_height="45dp"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
                     android:layout_margin="7dp"
                     android:background="@drawable/circle_shape"
                     android:clipToOutline="true"
@@ -54,7 +54,7 @@
                     android:ellipsize="end"
                     android:maxLines="2"
                     android:text="Contact Name"
-                    android:textSize="20sp"
+                    android:textSize="28sp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/textName"
                     app:layout_constraintTop_toTopOf="parent" />

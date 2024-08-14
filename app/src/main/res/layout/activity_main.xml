@@ -15,7 +15,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:title="Contacts"
+        app:title="Contacts List"
         app:titleCentered="true"
         app:titleTextColor="?attr/colorOnPrimary" />
 
@@ -30,3 +30,16 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
+<!--<SearchView-->
+<!--android:id="@+id/searchView"-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:backgroundTint="#D9D5D5"-->
+<!--android:iconifiedByDefault="false"-->
+<!--android:background="@drawable/search_bar_background"-->
+<!--android:queryBackground="@android:color/transparent"-->
+<!--android:queryHint="Search Notes"-->
+<!--app:layout_constraintEnd_toEndOf="parent"-->
+<!--app:layout_constraintStart_toStartOf="parent"-->
+<!--app:layout_constraintTop_toTopOf="parent" />-->

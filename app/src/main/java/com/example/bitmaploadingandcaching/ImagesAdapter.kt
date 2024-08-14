@@ -109,14 +109,14 @@ class ImagesAdapter(private var imageList:MutableList<Contact>,private var conte
             Thread{
                 try{
                     if(!networkLost){
-                        println("Download Started: ${imageList[position].name}")
+                        println("Download Started: ${imageList[position].name} ${Thread.currentThread().id}")
                         ongoingDownloads[imageUrl] = true
                         val url = URL(imageUrl).openConnection()
                         url.connect()
                         val inputStream = url.getInputStream()
                         val downloadedImage = BitmapFactory.decodeStream(inputStream)
                         inputStream.close()
-                        println("Download Finished: ${imageList[position].name}")
+                        println("Download Finished: ${imageList[position].name} ${Thread.currentThread().id}")
                         bitmapCache.put(imageUrl,downloadedImage)
                         handler.post {
                             var i = 0
@@ -136,6 +136,7 @@ class ImagesAdapter(private var imageList:MutableList<Contact>,private var conte
                             pendingRequests[imageUrl] = mutableListOf()
                         }
                     }
+
                     else{
                         pauseDownload[imageUrl] = HolderWithPosition(holder,position)
                         if(pendingRequests[imageUrl].isNullOrEmpty()){
@@ -146,7 +147,9 @@ class ImagesAdapter(private var imageList:MutableList<Contact>,private var conte
                             pendingRequests[imageUrl]?.add(HolderWithPosition(holder,position))
                         }
                     }
+
                 }
+
                 catch (e:UnknownHostException){
                     println("In UnKnown Host Exception")
 //                    Adding the Pause Download if any Network Interrupt Happens
@@ -159,14 +162,17 @@ class ImagesAdapter(private var imageList:MutableList<Contact>,private var conte
                         pendingRequests[imageUrl]?.add(HolderWithPosition(holder,position))
                     }
                 }
+
                 catch (e:MalformedURLException){
                     println("Download Error while Downloading : ${imageList[position].name}")
                     ongoingDownloads[imageUrl] = true
                 }
+
                 catch (e:Exception){
                     println("IN Catch $e")
                     ongoingDownloads[imageUrl] = false
                 }
+
             }.start()
         }
 
@@ -198,14 +204,14 @@ class ImagesAdapter(private var imageList:MutableList<Contact>,private var conte
         pauseDownload.forEach {
             Thread{
             try{
-//                println("Download Started: ${imageList[it.value.position].name}")
+//                println("Pause Download Started: ${imageList[it.value.position].name} ${Thread.currentThread().id}")
                 ongoingDownloads[it.key] = true
                 val url = URL(it.key).openConnection()
                 url.connect()
                 val inputStream = url.getInputStream()
                 val downloadedImage = BitmapFactory.decodeStream(inputStream)
                 inputStream.close()
-//                println("Download Finished: ${imageList[it.value.position].name}")
+//                println("Pause Download Finished: ${imageList[it.value.position].name} ${Thread.currentThread().id}")
                 bitmapCache.put(it.key, downloadedImage)
                 handler.post {
                     var i = 0
@@ -225,7 +231,7 @@ class ImagesAdapter(private var imageList:MutableList<Contact>,private var conte
                         }
                     }
 
-                    println("Total Updates for ${imageList[it.value.position]} is $i actual updates: $j")
+//                    println("Total Updates for ${imageList[it.value.position]} is $i actual updates: $j")
                     pendingRequests[it.key] = mutableListOf()
                 }
             }
