@@ -22,7 +22,9 @@ import androidx.core.view.setPadding
 import androidx.recyclerview.widget.RecyclerView
 import com.facebook.shimmer.ShimmerFrameLayout
 import kotlinx.coroutines.delay
+import java.net.MalformedURLException
 import java.net.URL
+import java.net.UnknownHostException
 import java.sql.Time
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.random.Random
@@ -125,6 +127,7 @@ class ImagesAdapter(private var imageList:MutableList<Contact>,private var conte
                             }
                             pendingRequests[imageUrl]?.forEach {
                                 i += 1
+//                                println("adapter position: ${it.holder.adapterPosition} item position: ${it.position}")
                                 if (it.holder.adapterPosition == it.position) {
                                     it.holder.imageView.setImageBitmap(downloadedImage)
                                     it.holder.imageView.visibility = View.VISIBLE
@@ -144,7 +147,24 @@ class ImagesAdapter(private var imageList:MutableList<Contact>,private var conte
                         }
                     }
                 }
+                catch (e:UnknownHostException){
+                    println("In UnKnown Host Exception")
+//                    Adding the Pause Download if any Network Interrupt Happens
+                    pauseDownload[imageUrl] = HolderWithPosition(holder,position)
+                    if(pendingRequests[imageUrl].isNullOrEmpty()){
+                        pendingRequests[imageUrl] = mutableListOf()
+                    }
+                    if(position !in positionList){
+                        positionList.add(position)
+                        pendingRequests[imageUrl]?.add(HolderWithPosition(holder,position))
+                    }
+                }
+                catch (e:MalformedURLException){
+                    println("Download Error while Downloading : ${imageList[position].name}")
+                    ongoingDownloads[imageUrl] = true
+                }
                 catch (e:Exception){
+                    println("IN Catch $e")
                     ongoingDownloads[imageUrl] = false
                 }
             }.start()
@@ -168,23 +188,24 @@ class ImagesAdapter(private var imageList:MutableList<Contact>,private var conte
     }
 
     fun downloadPendingRequests() {
-        Thread {
-            println("Pause Download Value: $pauseDownload")
-            println("Pause Download Size: ${pauseDownload.size}")
-            println("Pending Request Size: ${pendingRequests.size}")
-            pendingRequests.forEach{
-                println("${it.key} size: ${it.value.size}")
-            }
-            pauseDownload.forEach {
-                try{
-                println("Download Started: ${imageList[it.value.position].name}")
+
+        println("Pause Download Value: $pauseDownload")
+        println("Pause Download Size: ${pauseDownload.size}")
+        println("Pending Request Size: ${pendingRequests.size}")
+        pendingRequests.forEach{
+            println("${it.key} size: ${it.value.size}")
+        }
+        pauseDownload.forEach {
+            Thread{
+            try{
+//                println("Download Started: ${imageList[it.value.position].name}")
                 ongoingDownloads[it.key] = true
                 val url = URL(it.key).openConnection()
                 url.connect()
                 val inputStream = url.getInputStream()
                 val downloadedImage = BitmapFactory.decodeStream(inputStream)
                 inputStream.close()
-                println("Download Finished: ${imageList[it.value.position].name}")
+//                println("Download Finished: ${imageList[it.value.position].name}")
                 bitmapCache.put(it.key, downloadedImage)
                 handler.post {
                     var i = 0
@@ -196,6 +217,7 @@ class ImagesAdapter(private var imageList:MutableList<Contact>,private var conte
                     var j = 0
                     pendingRequests[it.key]?.forEach { applyChange ->
                         i+=1
+//                        println("adapter position: ${applyChange.holder.adapterPosition} item position: ${applyChange.position}")
                         if (applyChange.holder.adapterPosition == applyChange.position) {
                             j+=1
                             applyChange.holder.imageView.setImageBitmap(downloadedImage)
@@ -206,12 +228,11 @@ class ImagesAdapter(private var imageList:MutableList<Contact>,private var conte
                     println("Total Updates for ${imageList[it.value.position]} is $i actual updates: $j")
                     pendingRequests[it.key] = mutableListOf()
                 }
-                }
-                catch (e:Exception){
-                    ongoingDownloads[it.key] = false
-                }
             }
-
+            catch (e:Exception){
+                ongoingDownloads[it.key] = false
+            }
         }.start()
+        }
     }
 }
